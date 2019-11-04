@@ -39,7 +39,6 @@ namespace Rozo
 
         public void Stamp()
         {
-            Queue<PieceData> piecesQueue = new Queue<PieceData>();
             //Iterate through each pixel to check.
             // pixel # % width => x position
             // pixel # / width (floor) => y position
@@ -57,7 +56,7 @@ namespace Rozo
                 }
                 bool startingPixel = true;
                 Color targetColor = stampColors[pixel];
-                if (targetColor == ignoreColor)
+                if (targetColor.a == ignoreColor.a)
                 {
                     pixel++;
                     continue;
@@ -87,8 +86,8 @@ namespace Rozo
 
                     //Great! Now we know that the current pixel has not yet been processed.
                     //Let's get the pixel X and Y coordinates to track the position and size!
-                    int px = pixel % width;
-                    int py = pixel / width;
+                    int px = tempPixel % width;
+                    int py = tempPixel / width;
 
                     //Now we track the max/min values of the piece
                     if (px < minX)
@@ -99,19 +98,19 @@ namespace Rozo
                         minY = py;
                     if (py > maxY)
                         maxY = py;
-
+                    var test = 52;
                     //Now let's copy the pixel over to the canvas!
-                    canvas[pixel] = imageColors[pixel];
+                    canvas[tempPixel] = imageColors[tempPixel];
 
                     //Now let's make sure we check the rest of the pixels around the current one.
                     if (px + 1 < width)
-                        checkable.Push(pixel + 1); //Go forward 1 pixel x
+                        checkable.Push(tempPixel + 1); //Go forward 1 pixel x
                     if (px - 1 >= 0)
-                        checkable.Push(pixel - 1); //Go backward 1 pixel x
+                        checkable.Push(tempPixel - 1); //Go backward 1 pixel x
                     if (py + 1 < height)
-                        checkable.Push(pixel + width); //Go up 1 pixel y
+                        checkable.Push(tempPixel + width); //Go up 1 pixel y
                     if (py - 1 >= 0)
-                        checkable.Push(pixel - width); //Go down 1 pixel y
+                        checkable.Push(tempPixel - width); //Go down 1 pixel y
                 }
                 //At this point we've finished creating a piece. Now we need to cut out the texture from the canvas.
                 //Starting at minX,minY we need to copy all lines of length (maxX - minX)
@@ -119,13 +118,14 @@ namespace Rozo
                 //We should copy pixels: (minX + minY*width) to (minX + pieceWidth + minY*width) iterating for every y value.
                 int pieceWidth = maxX - minX;
                 int pieceHeight = maxY - minY;
+                int test2 = 4;
                 Color[] pieceColors = new Color[pieceWidth * pieceHeight];
-                for (int y = minY; y <= maxY; y++)
+                for (int y = minY; y < maxY; y++)
                 {
-                    Array.Copy(canvas, minX, pieceColors, y - minY, pieceWidth);
+                    Array.Copy(canvas, y * width + minX, pieceColors, (y-minY)*pieceWidth, pieceWidth);
                 }
                 //Add the pieceColors array to the queue for object processing here! :)
-                piecesQueue.Enqueue(new PieceData(minX, minY, pieceWidth, pieceHeight, pieceColors, pieceNum++, ppu));
+                pieceQueue.Enqueue(new PieceData(minX, minY, pieceWidth, pieceHeight, pieceColors, pieceNum++, ppu));
                 pixel++;
             }
             running = false;

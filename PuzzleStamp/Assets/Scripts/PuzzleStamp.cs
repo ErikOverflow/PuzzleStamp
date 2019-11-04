@@ -9,10 +9,17 @@ public class PuzzleStamp : MonoBehaviour
     GameObject piecePrefab;
     [SerializeField]
     Transform table;
+
+    [SerializeField]
+    Sprite testSprite;
+
+    ThreadedPuzzleStamp thread;
     // Start is called before the first frame update
     void Start()
     {
-        
+        Texture2D stampTex = Instantiate(testSprite.texture) as Texture2D;
+        Texture2D imageTex = Instantiate(testSprite.texture) as Texture2D;
+        StartCoroutine(Stamp(stampTex, imageTex));
     }
 
     // Update is called once per frame
@@ -27,7 +34,7 @@ public class PuzzleStamp : MonoBehaviour
         Color[] stampColors = stampTex.GetPixels();
         Color[] imageColors = imageTex.GetPixels();
         Queue<PieceData> pieceQueue = new Queue<PieceData>();
-        ThreadedPuzzleStamp thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.height, stampTex.width, pieceQueue, ppu);
+        thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.height, stampTex.width, pieceQueue, ppu);
         thread.Run();
 
         while (thread.running || pieceQueue.Count > 0)
@@ -51,5 +58,11 @@ public class PuzzleStamp : MonoBehaviour
             }
             yield return null;
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (thread != null)
+            thread.Abort();
     }
 }
