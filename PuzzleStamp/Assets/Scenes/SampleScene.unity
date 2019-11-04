@@ -235,7 +235,8 @@ MonoBehaviour:
   piecePrefab: {fileID: 7756458764849645036, guid: af98fee6e6149d34c9b12e34b7cffcfa,
     type: 3}
   table: {fileID: 1177308766}
-  testSprite: {fileID: 21300000, guid: 1f8d921c76c5b1b47b96e9cb612b3c3d, type: 3}
+  testStamp: {fileID: 21300000, guid: 06bb3ed10f7235244b250784e177fb25, type: 3}
+  testImage: {fileID: 21300000, guid: 5e8c00c731cf85b4686dcf68eeb0d022, type: 3}
 --- !u!4 &851060208
 Transform:
   m_ObjectHideFlags: 0

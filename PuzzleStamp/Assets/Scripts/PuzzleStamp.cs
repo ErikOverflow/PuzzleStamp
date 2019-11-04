@@ -11,14 +11,16 @@ public class PuzzleStamp : MonoBehaviour
     Transform table;
 
     [SerializeField]
-    Sprite testSprite;
+    Sprite testStamp;
+    [SerializeField]
+    Sprite testImage;
 
     ThreadedPuzzleStamp thread;
     // Start is called before the first frame update
     void Start()
     {
-        Texture2D stampTex = Instantiate(testSprite.texture) as Texture2D;
-        Texture2D imageTex = Instantiate(testSprite.texture) as Texture2D;
+        Texture2D stampTex = Instantiate(testStamp.texture) as Texture2D;
+        Texture2D imageTex = Instantiate(testImage.texture) as Texture2D;
         StartCoroutine(Stamp(stampTex, imageTex));
     }
 
@@ -30,11 +32,11 @@ public class PuzzleStamp : MonoBehaviour
 
     public IEnumerator Stamp(Texture2D stampTex, Texture2D imageTex)
     {
-        float ppu = 100f;
+        float ppu = testImage.pixelsPerUnit;
         Color[] stampColors = stampTex.GetPixels();
         Color[] imageColors = imageTex.GetPixels();
         Queue<PieceData> pieceQueue = new Queue<PieceData>();
-        thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.height, stampTex.width, pieceQueue, ppu);
+        thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.width, stampTex.height, pieceQueue, ppu);
         thread.Run();
 
         while (thread.running || pieceQueue.Count > 0)

@@ -98,7 +98,6 @@ namespace Rozo
                         minY = py;
                     if (py > maxY)
                         maxY = py;
-                    var test = 52;
                     //Now let's copy the pixel over to the canvas!
                     canvas[tempPixel] = imageColors[tempPixel];
 
@@ -116,13 +115,13 @@ namespace Rozo
                 //Starting at minX,minY we need to copy all lines of length (maxX - minX)
                 //Assuming the whole canvas is 100x100, and our piece is 25x25 size with the bottom left corner at x=20,y=30:
                 //We should copy pixels: (minX + minY*width) to (minX + pieceWidth + minY*width) iterating for every y value.
-                int pieceWidth = maxX - minX;
-                int pieceHeight = maxY - minY;
+                int pieceWidth = maxX - minX + 1;
+                int pieceHeight = maxY - minY + 1;
                 int test2 = 4;
                 Color[] pieceColors = new Color[pieceWidth * pieceHeight];
-                for (int y = minY; y < maxY; y++)
+                for (int y = minY; y <= maxY; y++)
                 {
-                    Array.Copy(canvas, y * width + minX, pieceColors, (y-minY)*pieceWidth, pieceWidth);
+                    Array.Copy(canvas, y * width + minX, pieceColors, (y - minY) * pieceWidth, pieceWidth);
                 }
                 //Add the pieceColors array to the queue for object processing here! :)
                 pieceQueue.Enqueue(new PieceData(minX, minY, pieceWidth, pieceHeight, pieceColors, pieceNum++, ppu));
