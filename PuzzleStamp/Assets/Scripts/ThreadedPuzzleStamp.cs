@@ -48,17 +48,19 @@ namespace Rozo
             int pixelCount = stampColors.Length;
             while (pixel < pixelCount)
             {
-                //If this pixel has already been processed, move to next loop
+                //If this pixel has already been processed, move to the next pixel
                 if (!processed.Add(pixel))
                 {
                     pixel++;
                     continue;
                 }
+                //If this pixel is transparent, move to the next pixel
                 if (stampColors[pixel].a == ignoreColor.a)
                 {
                     pixel++;
                     continue;
                 }
+                //Piece found: floodfill, blit and enqueue
                 FloodFillPiece(processed, pieceNum, pixel);
                 pieceNum++;
                 pixel++;
@@ -68,6 +70,7 @@ namespace Rozo
 
         private void FloodFillPiece(HashSet<int> _processed, int _pieceNum, int _pixel)
         {
+            //Initialize the floodfill properties
             bool startingPixel = true;
             Color targetColor = stampColors[_pixel];
             Stack<int> checkable = new Stack<int>();
@@ -76,16 +79,22 @@ namespace Rozo
             int minX = width;
             int minY = height;
             checkable.Push(_pixel);
+            
+            //Create a blank canvas to blit the piece onto
             Color[] canvas = new Color[stampColors.Length];
             System.Array.Clear(canvas, 0, canvas.Length);
+            
+            //Check the current pixel if it should be blitted, if true then add its neighbors to the stack
             while (checkable.Count > 0)
             {
                 int tempPixel = checkable.Pop();
-                if (stampColors[tempPixel] != targetColor) //if the pixel is not the target color, move on
+                //if the pixel is not the target color, skip to the next pixel on the stack
+                if (stampColors[tempPixel] != targetColor)
                 {
                     continue;
                 }
-                //At this point, we know the current pixel we are working with is the floodfill color and will be processed in the loop. Let's check to make sure it hasn't been processed already, or that it's the starting pixel.
+                //If the pixel has already been processed and it's NOT the starting pixel, then skip to the next pixel on the stack 
+                //(this prevents an infinite loop)
                 if (!startingPixel && !_processed.Add(tempPixel))
                 {
                     continue;
@@ -93,12 +102,12 @@ namespace Rozo
                 if (startingPixel)
                     startingPixel = false;
 
-                //Great! Now we know that the current pixel has not yet been processed.
-                //Let's get the pixel X and Y coordinates to track the position and size!
+                //The pixel has not yet been processed and should be blitted
+                //Get the pixel X and Y coordinates to track the position and size
                 int px = tempPixel % width;
                 int py = tempPixel / width;
 
-                //Now we track the max/min values of the piece
+                //Track the max/min values of the piece
                 if (px < minX)
                     minX = px;
                 if (px > maxX)
@@ -107,29 +116,32 @@ namespace Rozo
                     minY = py;
                 if (py > maxY)
                     maxY = py;
-                //Now let's copy the pixel over to the canvas!
+                
+                //Blit the pixel to the blank canvas
                 canvas[tempPixel] = imageColors[tempPixel];
 
-                //Now let's make sure we check the rest of the pixels around the current one.
+                //Add neighbor pixels to the stack
                 if (px + 1 < width)
-                    checkable.Push(tempPixel + 1); //Go forward 1 pixel x
+                    checkable.Push(tempPixel + 1); //Go right 1 pixel
                 if (px - 1 >= 0)
-                    checkable.Push(tempPixel - 1); //Go backward 1 pixel x
+                    checkable.Push(tempPixel - 1); //Go left 1 pixel
                 if (py + 1 < height)
-                    checkable.Push(tempPixel + width); //Go up 1 pixel y
+                    checkable.Push(tempPixel + width); //Go up 1 pixel
                 if (py - 1 >= 0)
-                    checkable.Push(tempPixel - width); //Go down 1 pixel y
+                    checkable.Push(tempPixel - width); //Go down 1 pixel
             }
-            //At this point we've finished creating a piece. Now we need to cut out the texture from the canvas.
-            //Starting at minX,minY we need to copy all lines of length (maxX - minX)
+            //All pixels have been blitted to the canvas
+            //Minimum and Maximum bounds have been identified.
             int pieceWidth = maxX - minX + 1;
             int pieceHeight = maxY - minY + 1;
+            //Create the minimum color array to hold all relevant pixels. (To reduce memory footprint)
             Color[] pieceColors = new Color[pieceWidth * pieceHeight];
+            //Copy the pixels from the canvas to the now smaller array vertically line-by-line
             for (int y = minY; y <= maxY; y++)
             {
                 Array.Copy(canvas, y * width + minX, pieceColors, (y - minY) * pieceWidth, pieceWidth);
             }
-            //Add the pieceColors array to the queue for object processing here! :)
+            //Add the pieceColors array to the concurrent queue to be grabbed by the main thread
             pieceQueue.Enqueue(new PieceData(minX, minY, pieceWidth, pieceHeight, pieceColors, _pieceNum, ppu));
         }
     }
