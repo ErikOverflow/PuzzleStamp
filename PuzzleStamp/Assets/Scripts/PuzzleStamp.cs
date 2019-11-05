@@ -24,26 +24,19 @@ public class PuzzleStamp : MonoBehaviour
         StartCoroutine(Stamp(stampTex, imageTex));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public IEnumerator Stamp(Texture2D stampTex, Texture2D imageTex)
     {
         float ppu = testImage.pixelsPerUnit;
+        //Convert textures to one-dimensional color arrays.
         Color[] stampColors = stampTex.GetPixels();
         Color[] imageColors = imageTex.GetPixels();
-        //0,0 => 0
-        //1,0 => 1
-        //0,1 => width
-        // x+y*width => array element #
 
+        //Create ConcurrentQueue and start the parallel thread
         Queue<PieceData> pieceQueue = new Queue<PieceData>();
         thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.width, stampTex.height, pieceQueue, ppu);
         thread.Run();
 
+        //While the parallel thread is running, monitor for newfound pieces and generate them in game
         while (thread.running || pieceQueue.Count > 0)
         {
             if (pieceQueue.Count > 0)
@@ -57,7 +50,8 @@ public class PuzzleStamp : MonoBehaviour
             yield return null;
         }
     }
-
+    
+    //If the game is closed or the scene changes, the thread should be aborted to prevent runaway threads.
     private void OnDestroy()
     {
         if (thread != null)
