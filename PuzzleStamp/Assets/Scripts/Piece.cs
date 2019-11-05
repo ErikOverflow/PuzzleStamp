@@ -11,10 +11,10 @@ public class Piece : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
     }
 
-    public void Customize(PieceData pieceData)
+    public virtual void Customize(PieceData pieceData)
     {
         Texture2D tex = new Texture2D(pieceData.width, pieceData.height);
-        tex.filterMode = FilterMode.Point;
+        tex.filterMode = FilterMode.Bilinear;
         tex.wrapMode = TextureWrapMode.Clamp;
         tex.SetPixels(pieceData.colors);
         tex.Apply();

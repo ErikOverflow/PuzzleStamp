@@ -61,7 +61,7 @@ namespace Rozo
                     pixel++;
                     continue;
                 }
-                Stack<int> checkable = new Stack<int>(); //Create a stack for the current piece to fill;
+                Stack<int> checkable = new Stack<int>();
                 int maxX = 0;
                 int maxY = 0;
                 int minX = width;
