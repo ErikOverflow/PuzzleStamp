@@ -35,6 +35,11 @@ public class PuzzleStamp : MonoBehaviour
         float ppu = testImage.pixelsPerUnit;
         Color[] stampColors = stampTex.GetPixels();
         Color[] imageColors = imageTex.GetPixels();
+        //0,0 => 0
+        //1,0 => 1
+        //0,1 => width
+        // x+y*width => array element #
+
         Queue<PieceData> pieceQueue = new Queue<PieceData>();
         thread = new ThreadedPuzzleStamp(stampColors, imageColors, stampTex.width, stampTex.height, pieceQueue, ppu);
         thread.Run();
@@ -48,15 +53,6 @@ public class PuzzleStamp : MonoBehaviour
                 newObj.transform.SetParent(table);
                 Piece piece = newObj.GetComponent<Piece>();
                 piece.Customize(pieceData);
-                /*
-                Texture2D tex = new Texture2D(pieceData.width, pieceData.height);
-                tex.SetPixels(pieceData.colors);
-                tex.filterMode = FilterMode.Bilinear;
-                tex.wrapMode = TextureWrapMode.Clamp;
-                tex.Apply();
-                Sprite sprite = Sprite.Create(tex, new Rect(0, 0, pieceData.width, pieceData.height), new Vector2(0.5f, 0.5f), ppu);
-                piece.Customize(sprite, new Vector2(pieceData.x/ppu, pieceData.y/ppu), pieceNum);
-                */
             }
             yield return null;
         }
