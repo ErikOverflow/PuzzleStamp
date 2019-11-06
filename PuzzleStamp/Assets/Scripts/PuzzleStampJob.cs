@@ -13,7 +13,7 @@ public class StampParallelFor : Monobehaviour
     {
         NativeQueue<PieceData> m_pieceQueue = new NativeQueue<PieceData>;
         
-        m_AccelJob = new AccelerationJob()
+        m_StampJob = new AccelerationJob()
         {
             pieceQueue = m_pieceQueue,
             stampColors = stampTex.GetPixels(),
@@ -23,7 +23,7 @@ public class StampParallelFor : Monobehaviour
             ppu = testImage.pixelsPerUnit
         };
         
-        m_StampJobHandle = m_StampJob.Schedule(
+        m_StampJobHandle = m_StampJob.Schedule();
     }
     
     struct PieceData
