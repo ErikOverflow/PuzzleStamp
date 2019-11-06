@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,11 +12,11 @@ namespace Rozo
         Color[] imageColors;
         float ppu;
         int width, height;
-        Queue<PieceData> pieceQueue;
+        ConcurrentQueue<PieceData> pieceQueue;
         Color ignoreColor = Color.clear;
         public bool running;
 
-        public ThreadedPuzzleStamp(Color[] _stampColors, Color[] _imageColors, int _width, int _height, Queue<PieceData> _pieceQueue, float _ppu)
+        public ThreadedPuzzleStamp(Color[] _stampColors, Color[] _imageColors, int _width, int _height, ConcurrentQueue<PieceData> _pieceQueue, float _ppu)
         {
             stampColors = _stampColors;
             imageColors = _imageColors;
